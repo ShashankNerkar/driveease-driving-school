@@ -1,0 +1,16 @@
+import api from './axios';
+export const getAdminDashboard = () => api.get('/admin/dashboard');
+export const getAdminUsers = (params) => api.get('/admin/users', { params });
+export const updateAdminUser = (id, data) => api.patch(`/admin/users/${id}`, data);
+export const getAdminBookings = (params) => api.get('/admin/bookings', { params });
+export const cancelAdminBooking = (id, data = {}) => api.patch(`/admin/bookings/${id}/cancel`, data);
+export const getAdminSlots = (params) => api.get('/admin/slots', { params });
+export const getAdminCourses = (params) => api.get('/admin/courses', { params });
+export const getAdminLessons = (params) => api.get('/admin/lessons', { params });
+export const getAdminSubscriptions = (params) => api.get('/admin/subscriptions', { params });
+export const getAdminPayments = (params) => api.get('/admin/payments', { params });
+export const getAdminDocuments = (params) => api.get('/admin/documents', { params });
+export const getModerationReviews = (params) => api.get('/reviews/moderation/all', { params });
+export const moderateReview = (id, action) => api.patch(`/reviews/${id}/${action}`);
+export const getModerationTestimonials = (params) => api.get('/testimonials/moderation/all', { params });
+export const moderateTestimonial = (id, action) => api.patch(`/testimonials/${id}/${action}`);

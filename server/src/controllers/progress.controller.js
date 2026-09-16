@@ -1,0 +1,3 @@
+const Enrollment = require('../models/Enrollment'); const ApiResponse = require('../utils/ApiResponse'); const ApiError = require('../utils/ApiError'); const { getCourseProgress } = require('../services/courseProgress.service');
+const getProgress = async (req, res, next) => { try { const enrollment = await Enrollment.findOne({ studentId: req.user.id, courseId: req.params.courseId }); if (!enrollment) throw new ApiError(403, 'You are not enrolled in this course.'); res.json(new ApiResponse(200, { progress: await getCourseProgress(req.user.id, req.params.courseId) }, 'Course progress fetched.')); } catch (error) { next(error); } };
+module.exports = { getProgress };
