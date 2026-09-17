@@ -4,17 +4,34 @@ import axios from 'axios';
  * axiosInstance — pre-configured Axios client for all DriveEase API calls.
  *
  * Base URL:
- *   - Development: Vite dev proxy forwards /api → http://localhost:5000/api
- *     so we use a relative base URL ("/api") to go through the proxy.
- *   - Production build: reads VITE_API_BASE_URL from .env
+ *   - Development: Uses '/api' (relative) which goes through Vite dev proxy
+ *   - Production: Uses full backend URL from VITE_API_BASE_URL env var
  *
  * withCredentials: true  → sends httpOnly cookies (JWT) with every request.
  *
  * Interceptors:
  *   - Response interceptor normalises error shapes and handles 401 globally.
  */
+
+// Determine base URL: use env var if set, otherwise detect dev vs prod
+const getBaseURL = () => {
+  // If VITE_API_BASE_URL is explicitly set, use it
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  
+  // In development (npm run dev), use relative URL for Vite proxy
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
+  
+  // In production build, must use full backend URL
+  // Default to Render backend if not configured
+  return 'https://driveease-driving-school.onrender.com/api';
+};
+
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: getBaseURL(),
   withCredentials: true,           // required for httpOnly cookie auth
   headers: {
     'Content-Type': 'application/json',
