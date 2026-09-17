@@ -15,9 +15,11 @@ import axios from 'axios';
 
 // Determine base URL: use env var if set, otherwise detect dev vs prod
 const getBaseURL = () => {
-  // If VITE_API_BASE_URL is explicitly set, use it
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  
+  // If VITE_API_BASE_URL is set to a full URL (starts with http), use it
+  if (envUrl && envUrl.startsWith('http')) {
+    return envUrl;
   }
   
   // In development (npm run dev), use relative URL for Vite proxy
@@ -26,7 +28,7 @@ const getBaseURL = () => {
   }
   
   // In production build, must use full backend URL
-  // Default to Render backend if not configured
+  // Ignore relative paths like '/api' in production
   return 'https://driveease-driving-school.onrender.com/api';
 };
 
