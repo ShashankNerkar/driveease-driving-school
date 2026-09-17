@@ -72,15 +72,39 @@ app.use(
   })
 );
 
-// ── CORS — allow only the configured client origin ────────────────────
-app.use(
-  cors({
-    origin:         process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials:    true, // required for httpOnly cookie exchange
-    methods:        ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+// ── CORS — allow configured origins + Vercel preview deployments ──────
+const allowedOrigins = [
+  process.env.CLIENT_URL || 'http://localhost:5173',
+  'https://driveease-driving-school.vercel.app', // Production Vercel domain
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Check if origin is in allowedOrigins list
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Allow Vercel preview deployments: driveease-driving-school-*-shashanknerkars-projects.vercel.app
+    const vercelPreviewPattern = /^https:\/\/driveease-driving-school-[a-z0-9]+-shashanknerkars-projects\.vercel\.app$/;
+    if (vercelPreviewPattern.test(origin)) {
+      return callback(null, true);
+    }
+
+    // Reject other origins
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true, // required for httpOnly cookie exchange
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 
 // ── Request logging (dev only) ────────────────────────────────────────
 if (process.env.NODE_ENV === 'development') {
