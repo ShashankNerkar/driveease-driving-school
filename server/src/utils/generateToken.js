@@ -47,14 +47,14 @@ const setTokenCookies = (res, accessToken, refreshToken) => {
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
     secure:   isProduction,           // HTTPS only in production
-    sameSite: isProduction ? 'strict' : 'lax',
+    sameSite: isProduction ? 'none' : 'lax',  // 'none' required for cross-origin cookies
     maxAge:   15 * 60 * 1000,         // 15 minutes in ms
   });
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure:   isProduction,
-    sameSite: isProduction ? 'strict' : 'lax',
+    sameSite: isProduction ? 'none' : 'lax',  // 'none' required for cross-origin cookies
     maxAge:   7 * 24 * 60 * 60 * 1000, // 7 days in ms
   });
 };
@@ -65,10 +65,12 @@ const setTokenCookies = (res, accessToken, refreshToken) => {
  * @param {object} res - Express response object
  */
 const clearTokenCookies = (res) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   const cookieOptions = {
     httpOnly: true,
-    secure:   process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    secure:   isProduction,
+    sameSite: isProduction ? 'none' : 'lax',  // 'none' required for cross-origin cookies
   };
 
   res.clearCookie('accessToken',  cookieOptions);
